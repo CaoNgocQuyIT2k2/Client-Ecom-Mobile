@@ -1,9 +1,15 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useNavigation } from 'expo-router';
 
 type Props = {}
 
 const CartScreen = (props: Props) => {
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation.setOptions({ title: "Cart" });
+  }, [navigation]);
   return (
     <View style={styles.container}>
       <Text>Cart Screen</Text>

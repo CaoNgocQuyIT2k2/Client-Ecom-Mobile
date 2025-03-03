@@ -1,9 +1,16 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useNavigation } from 'expo-router';
 
 type Props = {}
 
 const ExploreScreen = (props: Props) => {
+
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation.setOptions({ title: "Explore" });
+  }, [navigation]);
   return (
     <View style={styles.container}>
       <Text>Explore Screen</Text>
