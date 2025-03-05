@@ -1,9 +1,8 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Stack, Slot, router } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
+import { Slot, Redirect } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
-import "react-native-reanimated";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SplashScreen from "expo-splash-screen";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -15,18 +14,12 @@ export default function RootLayout() {
     const checkAuth = async () => {
       try {
         const token = await AsyncStorage.getItem("authToken");
-        console.log("🔹 Token từ AsyncStorage:", token);
-
-        if (token) {
-          setIsAuthenticated(true);
-        } else {
-          setIsAuthenticated(false);
-        }
+        setIsAuthenticated(!!token);
       } catch (error) {
         console.error("❌ Lỗi khi đọc authToken:", error);
       } finally {
         setLoading(false);
-        await SplashScreen.hideAsync(); // Ẩn SplashScreen khi xong
+        await SplashScreen.hideAsync();
       }
     };
 
@@ -42,18 +35,9 @@ export default function RootLayout() {
   }
 
   return (
-   <Stack>
-    {isAuthenticated ? (
-      <>
-       <Stack.Screen name="tabs" options={{ headerShown: false, headerTitle: "" }} />
-      </>
-    ) : (
-      <>
-        <Stack.Screen name="signin" options={{ presentation: "modal" }} />
-        <Stack.Screen name="signup" options={{ presentation: "modal" }} />
-        <Stack.Screen name="otpverify" options={{ headerTitle: "OTP Verification" }} />
-      </>
-    )}
-  </Stack>
+    <>
+      {!isAuthenticated && <Redirect href="/signin" />}
+      <Slot />
+    </>
   );
 }

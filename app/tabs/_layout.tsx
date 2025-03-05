@@ -7,32 +7,32 @@ export default function TabLayout() {
   return (
     <Tabs tabBar={props => <TabBar {...props} />} screenOptions={{headerTitle: "",headerShown: false}}>
       <Tabs.Screen name='index' options={{
-        title: 'Home',
+        title: 'Home',headerShown: false
         // tabBarIcon: ({color}) => (
         //   <Ionicons name='home-outline' size={22} color={color} />
         // )
       }} />
       <Tabs.Screen name='explore' options={{
-        title: 'Explore',
+        title: 'Explore',headerShown: false
         // tabBarIcon: ({color}) => (
         //   <Ionicons name='search-outline' size={22} color={color} />
         // )
       }} />
       <Tabs.Screen name='notifications' options={{
-        title: 'Notification',
+        title: 'Notification',headerShown: false
         // tabBarIcon: ({color}) => (
         //   <Ionicons name='notifications-outline' size={22} color={color} />
         // )
       }} />
       <Tabs.Screen name='cart' options={{
-        title: 'Cart',
+        title: 'Cart',headerShown: false,
         tabBarBadge: 3,
         // tabBarIcon: ({color}) => (
         //   <Ionicons name='cart-outline' size={22} color={color} />
         // )
       }} />
       <Tabs.Screen name='profile' options={{
-        title: 'Profile',
+        title: 'Profile',headerShown: false
         // tabBarIcon: ({color}) => (
         //   <Ionicons name='person-outline' size={22} color={color} />
         // )

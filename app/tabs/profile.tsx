@@ -1,43 +1,35 @@
 import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useState, useCallback, useEffect } from "react";
-import { Stack, useNavigation, useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
-import { jwtDecode } from "jwt-decode";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
+import { fetchUserProfile } from "@/services/userService";
 
 const ProfileScreen = () => {
   const headerHeight = useHeaderHeight();
   const router = useRouter();
-  const navigation = useNavigation();
 
-  useEffect(() => {
-    navigation.setOptions({ title: "Profile" });
-  }, [navigation]);
   const [userData, setUserData] = useState({
     username: "Guest",
     avatar: "https://xsgames.co/randomusers/avatar.php?g=male", // Avatar mặc định
   });
 
-  // 🟢 Load user data khi mở lại Profile
+  // 🟢 Load user data từ API khi mở lại Profile
   useFocusEffect(
     useCallback(() => {
       const loadUserData = async () => {
         try {
-          const token = await AsyncStorage.getItem("authToken");
-          if (token) {
-            const decoded: any = jwtDecode(token);
-            console.log("🔹 User từ token:", decoded);
+          const user = await fetchUserProfile(); // Gọi API lấy thông tin user
 
-            setUserData({
-              username: decoded.username || "Guest",
-              avatar: decoded.avatar || "https://xsgames.co/randomusers/avatar.php?g=male",
-            });
-          }
+          setUserData({
+            username: user.fullName || user.email,
+            avatar: user.avatar || "https://xsgames.co/randomusers/avatar.php?g=male",
+          });
         } catch (error) {
-          console.error("❌ Lỗi khi load user từ token:", error);
+          console.error("❌ Lỗi khi load user:", error);
         }
       };
 
@@ -58,9 +50,10 @@ const ProfileScreen = () => {
 
   return (
     <>
-      <Stack.Screen options={{ headerShown: true,headerTitleAlign: "center" , headerTransparent: true }} />
+      <Stack.Screen options={{ headerShown: false }} />
       <View style={[styles.container, { marginTop: headerHeight }]}>
-        <View style={{ alignItems: 'center' }}>
+   
+        <View style={{ alignItems: "center" }}>
           <Image source={{ uri: userData.avatar }} style={styles.avatar} />
           <Text style={styles.userName}>{userData.username}</Text>
         </View>
@@ -90,21 +83,17 @@ const ProfileScreen = () => {
         </View>
         <View style={styles.buttonWrapper}>
           <TouchableOpacity style={styles.button}>
-            <Ionicons
-              name="help-circle-outline"
-              size={20}
-              color={Colors.black}
-            />
+            <Ionicons name="help-circle-outline" size={20} color={Colors.black} />
             <Text style={styles.buttonTxt}>Customer Support</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.buttonWrapper}>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.push('/editprofile')} // Điều hướng đến trang editprofile
+            onPress={() => router.push("/changepassword")}
           >
-            <Ionicons name="settings-outline" size={20} color={Colors.black} />
-            <Text style={styles.buttonTxt}>Setting</Text>
+            <Ionicons name="lock-closed" size={20} color={Colors.black} />
+            <Text style={styles.buttonTxt}>Change Password</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.buttonWrapper}>
@@ -122,25 +111,25 @@ const ProfileScreen = () => {
         </View>
       </View>
     </>
-  )
-}
+  );
+};
 
-export default ProfileScreen
+export default ProfileScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
+    paddingTop: 120,
   },
   avatar: {
     width: 100,
     height: 100,
     borderRadius: 50,
   },
-
   userName: {
     fontSize: 20,
-    fontWeight: '500',
+    fontWeight: "500",
     color: Colors.black,
     marginTop: 10,
   },
@@ -153,13 +142,13 @@ const styles = StyleSheet.create({
     borderColor: Colors.lightGray,
     borderWidth: 1,
     borderRadius: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 10,
   },
   buttonTxt: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
     color: Colors.black,
   },
-})
+});

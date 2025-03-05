@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { FlatList, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native'
 import React, { useState, useRef, useEffect } from 'react'
 import { Colors } from '@/constants/Colors'
 import ProductItem from './ProductItem'
@@ -7,15 +7,23 @@ import ActionSheet, { ActionSheetRef } from 'react-native-actions-sheet';
 
 type Props = {
   products: ProductType[]
-  flatlist: boolean
-  
+  flatlist?: boolean
+  loadMoreProducts: () => void // Hàm load thêm sản phẩm
+  isLoadingMore: boolean // Trạng thái loading
+  ListHeaderComponent?: React.ReactElement // Thêm dòng này
 }
 
-const ProducList = ({ products, flatlist = true }: Props) => {
+const ProductList = ({ products, ListHeaderComponent,flatlist = true, loadMoreProducts, isLoadingMore }: Props) => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc') // Mặc định tăng dần
   const [sortedProducts, setSortedProducts] = useState<ProductType[]>([])
   const actionSheetRef = useRef<ActionSheetRef>(null)
 
+
+  useEffect(() => {
+    console.log('🔹 Sorted Products:', sortedProducts);
+  }, [sortedProducts]);
+
+  
   // Hàm sắp xếp sản phẩm theo giá
   const sortProducts = (order: 'asc' | 'desc') => {
     const sorted = [...products].sort((a, b) =>
@@ -44,13 +52,19 @@ const ProducList = ({ products, flatlist = true }: Props) => {
 
       {flatlist ? (
         <FlatList
-          numColumns={2}
-          nestedScrollEnabled={true} // Thêm dòng này
-          columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 20 }}
-          data={sortedProducts}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ index, item }) => <ProductItem item={item} index={index} />}
-        />
+        numColumns={2}
+        nestedScrollEnabled={true}
+        columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 20 }}
+        data={sortedProducts}
+        keyExtractor={(item, index) => item.id ? item.id.toString() : `fallback-key-${index}`}
+        renderItem={({ index, item }) => <ProductItem item={item} index={index} />}
+        onEndReached={loadMoreProducts}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          isLoadingMore ? <ActivityIndicator size="small" color={Colors.darkRed} /> : null
+        }
+      />
+      
       ) : (
         <View style={styles.itemsWrapper}>
           {sortedProducts.map((item, index) => (
@@ -99,7 +113,7 @@ const ProducList = ({ products, flatlist = true }: Props) => {
   )
 }
 
-export default ProducList
+export default ProductList
 
 const styles = StyleSheet.create({
   container: {

@@ -1,40 +1,41 @@
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  Alert,
-} from "react-native";
 import React, { useState } from "react";
-import { Link, router, Stack } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { StyleSheet, Text, TouchableOpacity, View, Alert } from "react-native";
+import { Link, router, Stack, useLocalSearchParams } from "expo-router";
 import InputField from "@/components/InputField";
 import { Ionicons } from "@expo/vector-icons";
-import { Colors } from "react-native/Libraries/NewAppScreen";
-import { loginUser } from "@/services/authService";
+import { Colors } from "@/constants/Colors";
+import { resetPassword } from "@/services/userService"; // API đặt lại mật khẩu
 
-const SignInScreen = () => {
-  const [emailOrUsername, setEmailOrUsername] = useState("");
-  const [password, setPassword] = useState("");
+const ResetPasswordScreen = () => {
+  const { email } = useLocalSearchParams();
+  const userEmail = Array.isArray(email) ? email[0] : email; // Đảm bảo email là string
+
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
-    if (!emailOrUsername || !password) {
-      Alert.alert("Error", "Please enter your username/email and password.");
+  const handleResetPassword = async () => {
+    if (!newPassword || !confirmPassword) {
+      Alert.alert("Lỗi", "Vui lòng nhập đầy đủ thông tin.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      Alert.alert("Lỗi", "Mật khẩu nhập lại không khớp.");
       return;
     }
 
     setLoading(true);
 
     try {
-      const userData = await loginUser(emailOrUsername, password);
-      // console.log("✅ Login successful:", userData);
+      await resetPassword(userEmail, newPassword);
+      Alert.alert("Thành công", "Mật khẩu của bạn đã được cập nhật!");
 
-      // Navigate to the main screen
-      router.replace("/tabs");
+      // Điều hướng đến trang đăng nhập
+      router.replace("/signin");
     } catch (error: any) {
-      console.error("❌ Login error:", error);
-      Alert.alert("Login Error", error.message);
+      console.error("❌ Lỗi đặt lại mật khẩu:", error);
+      Alert.alert("Lỗi", error.message || "Không thể đặt lại mật khẩu.");
     } finally {
       setLoading(false);
     }
@@ -44,7 +45,7 @@ const SignInScreen = () => {
     <>
       <Stack.Screen
         options={{
-          headerTitle: "Sign In",
+          headerTitle: "Đặt Lại Mật Khẩu",
           headerTitleAlign: "center",
           headerLeft: () => (
             <TouchableOpacity onPress={() => router.back()}>
@@ -54,48 +55,41 @@ const SignInScreen = () => {
         }}
       />
       <View style={styles.container}>
-        <Text style={styles.title}>Welcome Back</Text>
+        <Text style={styles.title}>Đặt Lại Mật Khẩu</Text>
 
         <InputField
-          placeholder="Email or Username"
+          placeholder="Mật khẩu mới"
           placeholderTextColor={Colors.gray}
-          autoCapitalize="none"
-          value={emailOrUsername}
-          onChangeText={setEmailOrUsername}
+          secureTextEntry
+          value={newPassword}
+          onChangeText={setNewPassword}
         />
 
         <InputField
-          placeholder="Password"
+          placeholder="Nhập lại mật khẩu mới"
+          placeholderTextColor={Colors.gray}
           secureTextEntry
-          value={password}
-          onChangeText={setPassword}
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
         />
-
-        {/* Nút Forgot Password */}
-        <TouchableOpacity
-          onPress={() => router.push("/forgotpassword")}
-          style={styles.forgotPasswordBtn}
-        >
-          <Text style={styles.forgotPasswordTxt}>Forgot Password?</Text>
-        </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.btn}
-          onPress={handleLogin}
+          onPress={handleResetPassword}
           disabled={loading}
         >
           <Text style={styles.btnTxt}>
-            {loading ? "Logging in..." : "Sign In"}
+            {loading ? "Đang cập nhật..." : "Xác nhận"}
           </Text>
         </TouchableOpacity>
 
         <View style={{ flexDirection: "row", marginTop: 30 }}>
-          <Text style={styles.loginTxt}>Don't have an account?</Text>
-          <Link href={"/signup"} asChild>
+          <Text style={styles.loginTxt}>Quay lại?</Text>
+          <Link href={"/signin"} asChild>
             <TouchableOpacity>
               <Text style={[styles.loginTxt, styles.loginTxtSpan]}>
                 {" "}
-                Sign Up{" "}
+                Đăng nhập{" "}
               </Text>
             </TouchableOpacity>
           </Link>
@@ -105,7 +99,7 @@ const SignInScreen = () => {
   );
 };
 
-export default SignInScreen;
+export default ResetPasswordScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -121,15 +115,6 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
     color: Colors.black,
     marginBottom: 50,
-  },
-  forgotPasswordBtn: {
-    alignSelf: "flex-end",
-    marginBottom: 15,
-  },
-  forgotPasswordTxt: {
-    color: Colors.primary,
-    fontSize: 14,
-    fontWeight: "500",
   },
   btn: {
     backgroundColor: Colors.primary,

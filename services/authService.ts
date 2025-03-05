@@ -14,7 +14,7 @@ export const loginUser = async (emailOrUsername: string, password: string) => {
     // Lưu token vào AsyncStorage
     if (userData.token) {
       await AsyncStorage.setItem("authToken", userData.token);
-      console.log("✅ Token đã lưu:", userData.token);
+      // console.log("✅ Token đã lưu:", userData.token);
     } else {
       throw new Error("Không nhận được token hợp lệ");
     }

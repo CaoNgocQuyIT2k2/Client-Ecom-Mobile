@@ -12,10 +12,10 @@ export default function AuthCheck() {
         const token = await AsyncStorage.getItem("authToken");
 
         if (token) {
-          console.log("🔹 Token từ AsyncStorage:", token);
+          // console.log("🔹 Token từ AsyncStorage:", token);
           router.replace("/tabs"); // Điều hướng sau khi token load xong
         } else {
-          router.replace("/signin"); // Nếu không có token thì về màn hình login
+          router.replace("/welcome"); // Nếu không có token thì về màn hình welcome
         }
       } catch (error) {
         console.error("❌ Lỗi khi đọc authToken:", error);

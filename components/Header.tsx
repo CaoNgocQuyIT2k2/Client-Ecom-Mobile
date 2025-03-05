@@ -1,13 +1,29 @@
-import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native'
-import React from 'react'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Colors } from '@/constants/Colors'
-import { Ionicons } from '@expo/vector-icons'
-import { Link, useRouter } from 'expo-router'
+import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
+import React, { useEffect, useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Colors } from "@/constants/Colors";
+import { Ionicons } from "@expo/vector-icons";
+import { Link, useRouter } from "expo-router";
+import { fetchUserProfile } from "@/services/userService";
 
 const Header = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const [avatar, setAvatar] = useState("https://i.pravatar.cc/40"); // Ảnh mặc định
+
+  useEffect(() => {
+    const loadUserAvatar = async () => {
+      try {
+        const user = await fetchUserProfile(); // Gọi API lấy thông tin user
+        console.log("🔹 Avatar từ API:", user.avatar);
+        setAvatar(user.avatar || "https://i.pravatar.cc/40"); // Cập nhật avatar
+      } catch (error) {
+        console.error("❌ Lỗi khi load avatar:", error);
+      }
+    };
+
+    loadUserAvatar();
+  }, []);
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -17,7 +33,7 @@ const Header = () => {
       </TouchableOpacity>
 
       {/* Ô Search */}
-      <Link href={'/explore'} asChild>
+      <Link href={"/tabs/explore"} asChild>
         <TouchableOpacity style={styles.searchBar}>
           <Text style={styles.searchTxt}>Search</Text>
           <Ionicons name="search-outline" size={20} color={Colors.gray} />
@@ -29,8 +45,8 @@ const Header = () => {
         <TouchableOpacity>
           <Ionicons name="notifications-outline" size={24} color={Colors.primary} />
         </TouchableOpacity>
-        <TouchableOpacity>
-          <Image source={{ uri: 'https://i.pravatar.cc/40' }} style={styles.avatar} />
+        <TouchableOpacity onPress={() => router.push("/editprofile")}>
+          <Image source={{ uri: avatar }} style={styles.avatar} />
         </TouchableOpacity>
       </View>
     </View>
@@ -41,9 +57,9 @@ export default Header;
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     backgroundColor: Colors.white,
     paddingHorizontal: 20,
     paddingBottom: 10,
@@ -55,16 +71,16 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingVertical: 8,
     paddingHorizontal: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginHorizontal: 10,
   },
   searchTxt: {
     color: Colors.gray,
   },
   rightSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 15,
   },
   avatar: {

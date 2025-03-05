@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native'
 import React, { useState } from 'react'
-import { Stack, router } from 'expo-router'
+import { Link, Stack, router } from 'expo-router'
 import InputField from '@/components/InputField'
 import { Ionicons } from '@expo/vector-icons'
 import { Colors } from '@/constants/Colors'
@@ -33,7 +33,7 @@ const SignUpScreen = () => {
         password,
         confirmPassword
       )
-      console.log('📩 Registration successful, redirecting to OTP:', data)
+      // console.log('📩 Registration successful, redirecting to OTP:', data)
       Alert.alert('Success', 'Please check your email for the OTP code.')
 
       // Navigate to the OTP verification screen
@@ -84,7 +84,21 @@ const SignUpScreen = () => {
             {loading ? 'Signing up...' : 'Create Account'}
           </Text>
         </TouchableOpacity>
+
+        <View style={{ flexDirection: "row" }}>
+                <Text style={styles.loginTxt}>Do you have an account?</Text>
+                <Link href={"/signin"} asChild>
+                  <TouchableOpacity>
+                    <Text style={[styles.loginTxt, styles.loginTxtSpan]}>
+                      {" "}
+                      SignIn{" "}
+                    </Text>
+                  </TouchableOpacity>
+                </Link>
+              </View>
       </View>
+
+       
     </>
   )
 }
@@ -113,4 +127,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   btnTxt: { color: Colors.white, fontSize: 16, fontWeight: '600' },
+    loginTxt: {
+      marginBottom: 30,
+      marginTop: 30,
+      fontSize: 14,
+      color: Colors.black,
+      lineHeight: 24,
+    },
+    loginTxtSpan: {
+      color: Colors.primary,
+      fontWeight: "600",
+    },
 })

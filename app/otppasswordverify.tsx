@@ -1,9 +1,10 @@
 import React, { useState, useRef } from "react";
 import { View, Text, TouchableOpacity, Alert, StyleSheet, TextInput } from "react-native";
-import { Stack, useLocalSearchParams, router } from "expo-router";
+import { Stack, useLocalSearchParams, router, useNavigation } from "expo-router";
 import { Colors } from "@/constants/Colors";
+import { verifyPasswordResetOTP } from "@/services/userService";
 
-const OtpVerifyScreen = () => {
+const OTPPasswordVerifyScreen = () => {
   const { email } = useLocalSearchParams();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputs = useRef<TextInput[]>([]);
@@ -20,23 +21,48 @@ const OtpVerifyScreen = () => {
     }
   };
 
-  const handleVerifyOTP = () => {
-    const otpCode = otp.join("");
-    if (otpCode.length !== 6) {
-      Alert.alert("Error", "Please enter a 6-digit OTP.");
-      return;
-    }
+  const navigation = useNavigation(); // Lấy navigation
 
-    Alert.alert("Success", "OTP verified successfully!");
-    router.push("/signin");
-  };
+const handleVerifyOTP = async () => {
+  const otpCode = otp.join("");
+  if (otpCode.length !== 6) {
+    Alert.alert("Lỗi", "Vui lòng nhập mã OTP gồm 6 chữ số.");
+    return;
+  }
 
+  const emailString = Array.isArray(email) ? email[0] : email || "";
+  if (!emailString) {
+    Alert.alert("Lỗi", "Không tìm thấy email.");
+    return;
+  }
+
+  try {
+    await verifyPasswordResetOTP(emailString, otpCode);
+    Alert.alert("Thành công", "OTP hợp lệ! Hãy đặt mật khẩu mới.");
+
+    console.log("Email để reset:", emailString);
+
+    // 🟢 Cách điều hướng an toàn hơn:
+    setTimeout(() => {
+      if (router && navigation) {
+        router.replace(`/resetpassword?email=${encodeURIComponent(emailString)}`);
+      } else {
+        console.warn("❌ Router hoặc Navigation chưa sẵn sàng!");
+      }
+    }, 100); // Thêm delay nhỏ để đảm bảo root layout đã mount
+  } catch (error: any) {
+    console.error("❌ Lỗi xác thực OTP:", error);
+    Alert.alert("Lỗi", error.message || "OTP không hợp lệ.");
+  }
+};
+  
+  
   return (
     <>
-      <Stack.Screen options={{ headerTitle: "OTP Verification", headerTitleAlign: "center" }} />
+      <Stack.Screen options={{ headerTitle: "Xác thực OTP", headerTitleAlign: "center" }} />
       <View style={styles.container}>
-        <Text style={styles.title}>Verification</Text>
-        <Text style={styles.subtitle}>Enter the OTP sent to your email</Text>
+        <Text style={styles.title}>Xác thực OTP</Text>
+        <Text style={styles.subtitle}>Nhập mã OTP đã gửi đến email của bạn</Text>
 
         <View style={styles.otpContainer}>
           {otp.map((digit, index) => (
@@ -53,14 +79,14 @@ const OtpVerifyScreen = () => {
         </View>
 
         <TouchableOpacity style={styles.verifyBtn} onPress={handleVerifyOTP}>
-          <Text style={styles.verifyText}>VERIFY</Text>
+          <Text style={styles.verifyText}>XÁC THỰC</Text>
         </TouchableOpacity>
       </View>
     </>
   );
 };
 
-export default OtpVerifyScreen;
+export default OTPPasswordVerifyScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20, backgroundColor: Colors.background },
