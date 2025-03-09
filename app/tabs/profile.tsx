@@ -90,10 +90,10 @@ const ProfileScreen = () => {
         <View style={styles.buttonWrapper}>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.push("/changepassword")}
+            
           >
-            <Ionicons name="lock-closed" size={20} color={Colors.black} />
-            <Text style={styles.buttonTxt}>Change Password</Text>
+            <Ionicons name="settings-outline" size={20} color={Colors.black} />
+            <Text style={styles.buttonTxt}>Setting</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.buttonWrapper}>
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 120,
+    paddingTop: 100,
   },
   avatar: {
     width: 100,

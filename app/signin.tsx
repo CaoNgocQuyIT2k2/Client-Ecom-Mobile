@@ -57,7 +57,7 @@ const SignInScreen = () => {
         <Text style={styles.title}>Welcome Back</Text>
 
         <InputField
-          placeholder="Email or Username"
+          placeholder="Username"
           placeholderTextColor={Colors.gray}
           autoCapitalize="none"
           value={emailOrUsername}

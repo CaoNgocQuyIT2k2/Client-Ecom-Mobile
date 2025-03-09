@@ -121,3 +121,107 @@ export const resetPassword = async (email: string, newPassword: string) => {
     throw error;
   }
 };
+// 🟢 API cập nhật chỉ fullName
+export const updateFullName = async (fullName: string) => {
+  try {
+    const token = await AsyncStorage.getItem("authToken");
+    if (!token) throw new Error("Không tìm thấy token");
+
+    const response = await axios.put(
+      `${BASE_URL}/user/updateFullName`,
+      { fullName }, // Chỉ gửi fullName
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    return response.data;
+  } catch (error: any) {
+    console.error("❌ Lỗi cập nhật fullName:", error.message);
+    throw error;
+  }
+};
+
+// 🟢 Gửi yêu cầu đổi số điện thoại mới
+export const requestChangePhone = async (idUser: number, newPhoneNumber: string) => {
+  try {
+    const token = await AsyncStorage.getItem("authToken");
+    if (!token) throw new Error("Không tìm thấy token");
+
+    const response = await axios.post(
+      `${BASE_URL}/user/requestChangePhone`, // ✅ Đúng endpoint mới
+      { idUser, newPhoneNumber }, // ✅ Dùng idUser
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    return response.data;
+  } catch (error: any) {
+    console.error("❌ Lỗi gửi OTP đổi số điện thoại:", error.message);
+    throw error;
+  }
+};
+
+
+// 🟢 Xác thực OTP để đổi số điện thoại mới
+export const verifyChangePhone = async (idUser: number, otpCode: string, newPhoneNumber: string) => {
+  try {
+    const token = await AsyncStorage.getItem("authToken");
+    if (!token) throw new Error("Không tìm thấy token");
+
+    const response = await axios.post(
+      `${BASE_URL}/user/verifyChangePhone`, // ✅ Đúng endpoint mới
+      { idUser, otpCode, newPhoneNumber }, // ✅ Dùng idUser
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    return response.data;
+  } catch (error: any) {
+    console.error("❌ Lỗi xác thực OTP đổi số điện thoại:", error.message);
+    throw error;
+  }
+};
+// 🟢 Gửi yêu cầu đổi email mới
+export const requestChangeEmail = async (idUser: number, newEmail: string) => {
+  try {
+    const token = await AsyncStorage.getItem("authToken");
+    if (!token) throw new Error("Không tìm thấy token");
+
+    const response = await axios.post(
+      `${BASE_URL}/user/requestChangeEmail`,
+      { idUser, newEmail },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    return response.data;
+  } catch (error: any) {
+    console.error("❌ Lỗi gửi OTP đổi email:", error.message);
+    throw error;
+  }
+};
+
+// 🟢 Xác thực OTP để đổi email mới
+export const verifyChangeEmail = async (idUser: number, otpCode: string, newEmail: string) => {
+  try {
+    const token = await AsyncStorage.getItem("authToken");
+    if (!token) throw new Error("Không tìm thấy token");
+
+    const response = await axios.post(
+      `${BASE_URL}/user/verifyChangeEmail`,
+      { idUser, otpCode, newEmail },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    return response.data;
+  } catch (error: any) {
+    console.error("❌ Lỗi xác thực OTP đổi email:", error.message);
+    throw error;
+  }
+};

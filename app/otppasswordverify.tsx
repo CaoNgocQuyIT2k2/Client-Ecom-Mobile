@@ -40,7 +40,7 @@ const handleVerifyOTP = async () => {
     await verifyPasswordResetOTP(emailString, otpCode);
     Alert.alert("Thành công", "OTP hợp lệ! Hãy đặt mật khẩu mới.");
 
-    console.log("Email để reset:", emailString);
+    // console.log("Email để reset:", emailString);
 
     // 🟢 Cách điều hướng an toàn hơn:
     setTimeout(() => {
