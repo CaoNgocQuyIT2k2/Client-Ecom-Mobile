@@ -29,13 +29,14 @@ const ProductItem = ({ item ,index}: Props) => {
         <Text style={styles.price}>${item.price}</Text>
         <View style={styles.ratingWrapper}>
             <Ionicons name='star' size={20} color={"#D4AF37"}/>
-            <Text style={styles.rating}>4.7</Text>
+            <Text style={styles.rating}>{item.ratings.average}</Text>  
         </View>
       </View>
       <Text style={styles.title}>{item.title}</Text>
     </Animated.View>
   )
 }
+
 
 export default ProductItem
 

@@ -34,12 +34,12 @@ const ChangePhoneScreen = () => {
       // 🟢 Giải mã token để lấy idUser
       const decodedToken: any = jwtDecode(token);
       const idUser = decodedToken?.idUser; // ✅ Sử dụng idUser thay vì userId
-      console.log(decodedToken);
+      // console.log(decodedToken);
       if (!idUser) {
         throw new Error("Không thể lấy ID người dùng từ token.");
       }
 
-      console.log("✅ User ID:", idUser); // Kiểm tra giá trị idUser
+      // console.log("✅ User ID:", idUser); // Kiểm tra giá trị idUser
 
       // 🟢 Gửi API yêu cầu đổi số điện thoại
       await requestChangePhone(idUser, newPhoneNumber);

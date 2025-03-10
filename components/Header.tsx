@@ -1,51 +1,78 @@
-import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
-import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View, Image, TextInput } from "react-native";
+import React, { useEffect, useState, RefObject } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { fetchUserProfile } from "@/services/userService";
+  import { useSegments } from "expo-router";
 
-const Header = () => {
+type HeaderProps = {
+  searchInputRef?: RefObject<TextInput>;
+};
+
+const Header: React.FC<HeaderProps> = ({ searchInputRef }) => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const [avatar, setAvatar] = useState("https://i.pravatar.cc/40"); // Ảnh mặc định
+  const [avatar, setAvatar] = useState("https://i.pravatar.cc/40");
+  const [searchText, setSearchText] = useState("");
 
+  const segments = useSegments(); // Lấy thông tin đường dẫn hiện tại
   useEffect(() => {
     const loadUserAvatar = async () => {
       try {
-        const user = await fetchUserProfile(); // Gọi API lấy thông tin user
-        console.log("🔹 Avatar từ API:", user.avatar);
-        setAvatar(user.avatar || "https://i.pravatar.cc/40"); // Cập nhật avatar
+        const user = await fetchUserProfile();
+        setAvatar(user.avatar || "https://i.pravatar.cc/40");
       } catch (error) {
-        console.error("❌ Lỗi khi load avatar:", error);
+        console.error("❌ Error loading avatar:", error);
       }
     };
 
     loadUserAvatar();
   }, []);
 
+  const handleSearch = () => {
+    if (searchText.trim()) {
+      router.push(`/tabs/explore?key=${encodeURIComponent(searchText)}`);
+    } else {
+      router.push(`/tabs/explore`);
+    }
+  };
+
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      {/* Nút Back */}
       <TouchableOpacity onPress={() => router.back()}>
         <Ionicons name="arrow-back-outline" size={24} color={Colors.primary} />
       </TouchableOpacity>
 
-      {/* Ô Search */}
-      <Link href={"/tabs/explore"} asChild>
-        <TouchableOpacity style={styles.searchBar}>
-          <Text style={styles.searchTxt}>Search</Text>
+      <View style={styles.searchBar}>
+      <TextInput
+  ref={searchInputRef} // Đảm bảo input thực sự nhận ref
+  style={styles.searchInput}
+  placeholder="Search"
+  placeholderTextColor={Colors.gray}
+  value={searchText}
+  onChangeText={setSearchText}
+  onFocus={() => {
+    if (segments[1] !== "explore") {
+      router.push("/tabs/explore");
+    }
+  }}
+  onSubmitEditing={handleSearch}
+/>
+
+
+
+        <TouchableOpacity onPress={handleSearch}>
           <Ionicons name="search-outline" size={20} color={Colors.gray} />
         </TouchableOpacity>
-      </Link>
+      </View>
 
-      {/* Chuông thông báo & Avatar */}
       <View style={styles.rightSection}>
         <TouchableOpacity>
           <Ionicons name="notifications-outline" size={24} color={Colors.primary} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/editprofile")}>
+        <TouchableOpacity onPress={() => router.push("/tabs/profile")}>
           <Image source={{ uri: avatar }} style={styles.avatar} />
         </TouchableOpacity>
       </View>
@@ -54,6 +81,8 @@ const Header = () => {
 };
 
 export default Header;
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -69,14 +98,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
     borderRadius: 5,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
     flexDirection: "row",
-    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 10,
     marginHorizontal: 10,
   },
-  searchTxt: {
-    color: Colors.gray,
+  searchInput: {
+    flex: 1,
+    paddingVertical: 8,
+    color: Colors.black,
   },
   rightSection: {
     flexDirection: "row",
@@ -87,6 +117,5 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: Colors.gray,
   },
 });

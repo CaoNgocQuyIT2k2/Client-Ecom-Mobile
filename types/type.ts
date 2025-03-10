@@ -5,6 +5,18 @@ export interface ProductType {
   description: string;
   images: string[];
   category: Category;
+  soldCount: number;
+  ratings: {
+    totalRatings: number;
+    stars: {
+      1: number;
+      2: number;
+      3: number;
+      4: number;
+      5: number;
+    };
+    average: number;
+  };
 }
 
 interface Category {

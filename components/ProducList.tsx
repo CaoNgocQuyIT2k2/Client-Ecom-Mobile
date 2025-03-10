@@ -1,74 +1,100 @@
-import { FlatList, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native'
-import React, { useState, useRef, useEffect } from 'react'
-import { Colors } from '@/constants/Colors'
-import ProductItem from './ProductItem'
-import { ProductType } from '@/types/type'
+import { 
+  FlatList, 
+  StyleSheet, 
+  Text, 
+  TouchableOpacity, 
+  View, 
+  ActivityIndicator 
+} from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { Colors } from '@/constants/Colors';
+import ProductItem from './ProductItem';
+import { ProductType } from '@/types/type';
 import ActionSheet, { ActionSheetRef } from 'react-native-actions-sheet';
+import { Ionicons } from '@expo/vector-icons';
 
 type Props = {
-  products: ProductType[]
-  flatlist?: boolean
-  loadMoreProducts: () => void // Hàm load thêm sản phẩm
-  isLoadingMore: boolean // Trạng thái loading
-  ListHeaderComponent?: React.ReactElement // Thêm dòng này
-}
+  products: ProductType[];
+  flatlist?: boolean;
+  loadMoreProducts: () => void; // Hàm load thêm sản phẩm
+  isLoadingMore: boolean; // Trạng thái loading
+  ListHeaderComponent?: React.ReactElement;
+};
 
-const ProductList = ({ products, ListHeaderComponent,flatlist = true, loadMoreProducts, isLoadingMore }: Props) => {
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc') // Mặc định tăng dần
-  const [sortedProducts, setSortedProducts] = useState<ProductType[]>([])
-  const actionSheetRef = useRef<ActionSheetRef>(null)
+const ProductList = ({ 
+  products, 
+  ListHeaderComponent, 
+  flatlist = true, 
+  loadMoreProducts, 
+  isLoadingMore 
+}: Props) => {
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc'); // Mặc định tăng dần
+  const [sortedProducts, setSortedProducts] = useState<ProductType[]>([]);
+  const actionSheetRef = useRef<ActionSheetRef>(null);
 
+  // Loại bỏ sản phẩm trùng lặp theo id
+  const uniqueProducts = products.filter(
+    (item, index, self) => index === self.findIndex((p) => p.id === item.id)
+  );
 
   useEffect(() => {
     console.log('🔹 Sorted Products:', sortedProducts);
   }, [sortedProducts]);
 
-  
   // Hàm sắp xếp sản phẩm theo giá
   const sortProducts = (order: 'asc' | 'desc') => {
-    const sorted = [...products].sort((a, b) =>
+    const sorted = [...uniqueProducts].sort((a, b) =>
       order === 'asc' ? a.price - b.price : b.price - a.price
-    )
-    setSortedProducts(sorted)
-    setSortOrder(order)
-  }
+    );
+    setSortedProducts(sorted);
+    setSortOrder(order);
+  };
 
   // Sắp xếp mặc định khi component được render lần đầu
   useEffect(() => {
-    sortProducts('asc')
-  }, [products])
+    sortProducts('asc');
+  }, [products]);
 
   return (
     <View style={styles.container}>
       <View style={styles.titleWrapper}>
-        <Text style={styles.title}>For You</Text>
-        {/* Nút mở ActionSheet */}
-        <TouchableOpacity onPress={() => actionSheetRef.current?.show()}>
+      <Text style={styles.title}>For You</Text>
+        {/* Nút sắp xếp có icon */}
+        <TouchableOpacity 
+          onPress={() => actionSheetRef.current?.show()} 
+          style={styles.iconButton}
+        >
+          <Ionicons name="swap-vertical" size={16} color={Colors.gray} />
           <Text style={styles.titleBtn}>
-            Sort by: {sortOrder === 'asc' ? 'Low to High' : 'High to Low'}
+            Sort: {sortOrder === 'asc' ? 'Low to High' : 'High to Low'}
           </Text>
         </TouchableOpacity>
+
+      
       </View>
 
       {flatlist ? (
         <FlatList
-        numColumns={2}
-        nestedScrollEnabled={true}
-        columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 20 }}
-        data={sortedProducts}
-        keyExtractor={(item, index) => item.id ? item.id.toString() : `fallback-key-${index}`}
-        renderItem={({ index, item }) => <ProductItem item={item} index={index} />}
-        onEndReached={loadMoreProducts}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={
-          isLoadingMore ? <ActivityIndicator size="small" color={Colors.darkRed} /> : null
-        }
-      />
-      
+          numColumns={2}
+          nestedScrollEnabled={true}
+          columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 20 }}
+          data={sortedProducts}
+          keyExtractor={(item, index) => `${item.id || index}`} // Đảm bảo key không bị trùng
+          renderItem={({ index, item }) => <ProductItem item={item} index={index} />}
+          onEndReached={() => {
+            if (!isLoadingMore) {
+              loadMoreProducts();
+            }
+          }}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            isLoadingMore ? <ActivityIndicator size="small" color={Colors.darkRed} /> : null
+          }
+        />
       ) : (
         <View style={styles.itemsWrapper}>
           {sortedProducts.map((item, index) => (
-            <View key={index} style={styles.productWrapper}>
+            <View key={item.id || index} style={styles.productWrapper}>
               <ProductItem item={item} index={index} />
             </View>
           ))}
@@ -78,42 +104,39 @@ const ProductList = ({ products, ListHeaderComponent,flatlist = true, loadMorePr
       {/* ActionSheet với lựa chọn Giá tăng dần & Giá giảm dần */}
       <ActionSheet ref={actionSheetRef}>
         <View style={styles.actionSheetContainer}>
-          {/* Giá tăng dần */}
           <TouchableOpacity
             style={styles.option}
             onPress={() => {
-              sortProducts('asc')
-              actionSheetRef.current?.hide()
+              sortProducts('asc');
+              actionSheetRef.current?.hide();
             }}
           >
             <Text style={styles.optionText}>Low to High</Text>
           </TouchableOpacity>
 
-          {/* Giá giảm dần */}
           <TouchableOpacity
             style={styles.option}
             onPress={() => {
-              sortProducts('desc')
-              actionSheetRef.current?.hide()
+              sortProducts('desc');
+              actionSheetRef.current?.hide();
             }}
           >
             <Text style={styles.optionText}>High to Low</Text>
           </TouchableOpacity>
 
-          {/* Hủy */}
           <TouchableOpacity
             style={styles.option}
             onPress={() => actionSheetRef.current?.hide()}
           >
-            <Text style={[styles.optionText, { color: 'red' }]}>Hủy</Text>
+            <Text style={[styles.optionText, { color: 'red' }]}>Cancel</Text>
           </TouchableOpacity>
         </View>
       </ActionSheet>
     </View>
-  )
-}
+  );
+};
 
-export default ProductList
+export default ProductList;
 
 const styles = StyleSheet.create({
   container: {
@@ -123,6 +146,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 10,
     justifyContent: 'space-between',
+  },
+  iconButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5, // Khoảng cách giữa icon và text
   },
   title: {
     fontWeight: '600',
@@ -161,4 +189,4 @@ const styles = StyleSheet.create({
     color: Colors.black,
     textAlign: 'center',
   },
-})
+});
