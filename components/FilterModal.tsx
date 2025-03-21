@@ -90,7 +90,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ visible, onClose, onApply }) 
                 setSelectedRatings([]);
               }}
             >
-              <Text style={{ color: "#f00" }}>Reset</Text>
+              <Text style={{ color: Colors.black }}>Reset</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: "#ccc",
     padding: 8,
     borderRadius: 5,
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 15,
     borderRadius: 10,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: "#ccc",
     marginHorizontal: 5,
     backgroundColor: "#fff",
@@ -169,15 +169,17 @@ const styles = StyleSheet.create({
   resetButton: {
     flex: 1,
     paddingVertical: 12,
-    backgroundColor: "#FFCDD2", // Màu đỏ nhạt
+    backgroundColor: Colors.white, // Màu đỏ nhạt
     borderRadius: 10,
+    borderColor: Colors.black,
+    borderWidth: 1,
     alignItems: "center",
     marginRight: 10, // Khoảng cách với nút Apply
   },
   applyButton: {
     flex: 1,
     paddingVertical: 12,
-    backgroundColor: Colors.darkRed, // Màu chính của ứng dụng
+    backgroundColor: Colors.primary, // Màu chính của ứng dụng
     borderRadius: 10,
     alignItems: "center",
   },

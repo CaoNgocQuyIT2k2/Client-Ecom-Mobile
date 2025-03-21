@@ -38,7 +38,7 @@ const ProductList = ({
   );
 
   useEffect(() => {
-    console.log('🔹 Sorted Products:', sortedProducts);
+    // console.log('🔹 Sorted Products:', sortedProducts);
   }, [sortedProducts]);
 
   // Hàm sắp xếp sản phẩm theo giá

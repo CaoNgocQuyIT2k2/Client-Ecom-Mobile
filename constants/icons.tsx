@@ -18,15 +18,14 @@ export const icon = {
   ),
   profile: ({ color }: { color: string }) => {
     const [avatar, setAvatar] = useState(
-      "https://xsgames.co/randomusers/avatar.php?g=male"
+      '@/assets/images/defaultUser.png'
     ); // Ảnh mặc định
 
     useEffect(() => {
       const loadUserAvatar = async () => {
         try {
           const user = await fetchUserProfile();
-          console.log("🔹 Avatar từ API:", user.avatar);
-          setAvatar(user.avatar || "https://xsgames.co/randomusers/avatar.php?g=male");
+          setAvatar(user.avatar || '@/assets/images/defaultUser.png');
         } catch (error) {
           console.error("❌ Lỗi khi load avatar:", error);
         }

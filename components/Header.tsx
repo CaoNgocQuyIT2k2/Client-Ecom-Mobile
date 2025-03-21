@@ -22,7 +22,7 @@ const Header: React.FC<HeaderProps> = ({ searchInputRef }) => {
     const loadUserAvatar = async () => {
       try {
         const user = await fetchUserProfile();
-        setAvatar(user.avatar || "https://i.pravatar.cc/40");
+        setAvatar(user.avatar || '@/assets/images/defaultUser.png');
       } catch (error) {
         console.error("❌ Error loading avatar:", error);
       }
@@ -33,9 +33,9 @@ const Header: React.FC<HeaderProps> = ({ searchInputRef }) => {
 
   const handleSearch = () => {
     if (searchText.trim()) {
-      router.push(`/tabs/explore?key=${encodeURIComponent(searchText)}`);
+      router.push(`/main-tabs/explore?key=${encodeURIComponent(searchText)}`);
     } else {
-      router.push(`/tabs/explore`);
+      router.push(`/main-tabs/explore`);
     }
   };
 
@@ -54,10 +54,12 @@ const Header: React.FC<HeaderProps> = ({ searchInputRef }) => {
   value={searchText}
   onChangeText={setSearchText}
   onFocus={() => {
-    if (segments[1] !== "explore") {
-      router.push("/tabs/explore");
+    if (segments?.[1] !== "explore") {
+      router.push("/main-tabs/explore");
     }
   }}
+  
+  
   onSubmitEditing={handleSearch}
 />
 
@@ -72,7 +74,7 @@ const Header: React.FC<HeaderProps> = ({ searchInputRef }) => {
         <TouchableOpacity>
           <Ionicons name="notifications-outline" size={24} color={Colors.primary} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/tabs/profile")}>
+        <TouchableOpacity onPress={() => router.push("/main-tabs/profile")}>
           <Image source={{ uri: avatar }} style={styles.avatar} />
         </TouchableOpacity>
       </View>

@@ -155,7 +155,7 @@ const EditProfileScreen = () => {
       {/* Nút Back */}
       <TouchableOpacity
         style={styles.backButton}
-        onPress={() => router.push('/tabs/profile')}
+        onPress={() => router.push('/main-tabs/profile')}
       >
         <Ionicons name="arrow-back" size={24} color="black" />
       </TouchableOpacity>

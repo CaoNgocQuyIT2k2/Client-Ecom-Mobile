@@ -8,19 +8,20 @@ type Props = {
   onLongPress: () => void;
   isFocused: boolean;
   label: string;
-  routeName: keyof typeof icon; // Chỉ nhận các key hợp lệ từ `icon`
+  routeName: keyof typeof icon;
+  cartCount?: number; // Nhận số lượng sản phẩm trong giỏ
 };
 
-const TabBarButton = ({ onPress, onLongPress, isFocused, label, routeName }: Props) => {
+const TabBarButton = ({ onPress, onLongPress, isFocused, label, routeName, cartCount = 0 }: Props) => {
   return (
     <Pressable onPress={onPress} onLongPress={onLongPress} style={styles.tabbarBtn}>
-      {/* Hiển thị badge cho Cart */}
-      {routeName === 'cart' && (
+      {/* Hiển thị badge nếu có sản phẩm trong giỏ hàng */}
+      {routeName === 'cart' && cartCount > 0 && (
         <View style={styles.badgeWrapper}>
-          <Text style={styles.badgeText}>3</Text>
+          <Text style={styles.badgeText}>{cartCount}</Text>
         </View>
       )}
-      
+
       {/* Hiển thị icon từ object `icon` */}
       {icon[routeName] && icon[routeName]({ color: isFocused ? Colors.primary : Colors.black })}
       <Text style={{ color: isFocused ? '#673ab7' : '#222' }}>{label}</Text>
@@ -50,5 +51,6 @@ const styles = StyleSheet.create({
   badgeText: {
     color: Colors.black,
     fontSize: 12,
+    fontWeight: 'bold',
   },
 });

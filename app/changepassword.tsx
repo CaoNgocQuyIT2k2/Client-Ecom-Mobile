@@ -36,7 +36,7 @@ const ChangePasswordScreen = () => {
         newPassword: "newpassword123",
       });
       Alert.alert("Success", "Password changed successfully!");
-      router.replace("/tabs/profile");
+      router.replace("/main-tabs/profile");
   } catch (error) {
       if (error instanceof Error) {
         Alert.alert("Error", error.message);

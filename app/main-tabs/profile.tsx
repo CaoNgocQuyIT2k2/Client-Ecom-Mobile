@@ -14,7 +14,7 @@ const ProfileScreen = () => {
 
   const [userData, setUserData] = useState({
     username: "Guest",
-    avatar: "https://xsgames.co/randomusers/avatar.php?g=male", // Avatar mặc định
+    avatar: "../../assets/images/defaultUser.png", // Avatar mặc định
   });
 
   // 🟢 Load user data từ API khi mở lại Profile
@@ -26,7 +26,7 @@ const ProfileScreen = () => {
 
           setUserData({
             username: user.fullName || user.email,
-            avatar: user.avatar || "https://xsgames.co/randomusers/avatar.php?g=male",
+            avatar: user.avatar || '@/assets/images/defaultUser.png',
           });
         } catch (error) {
           console.error("❌ Lỗi khi load user:", error);
@@ -50,8 +50,8 @@ const ProfileScreen = () => {
 
   return (
     <>
-      <Stack.Screen options={{ headerShown: false }} />
-      <View style={[styles.container, { marginTop: headerHeight }]}>
+      <Stack.Screen options={{ headerShown: true}} />
+      <View style={[styles.container, { marginTop: headerHeight - 50}]}>
    
         <View style={{ alignItems: "center" }}>
           <Image source={{ uri: userData.avatar }} style={styles.avatar} />
@@ -76,9 +76,9 @@ const ProfileScreen = () => {
           </TouchableOpacity>
         </View>
         <View style={styles.buttonWrapper}>
-          <TouchableOpacity style={styles.button}>
-            <Ionicons name="gift-outline" size={20} color={Colors.black} />
-            <Text style={styles.buttonTxt}>Reward Point</Text>
+          <TouchableOpacity style={styles.button} onPress={() =>router.push('/order')}>
+            <Ionicons name="cube-outline" size={20} color={Colors.black}  />
+            <Text style={styles.buttonTxt}>Orders</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.buttonWrapper}>
@@ -90,10 +90,10 @@ const ProfileScreen = () => {
         <View style={styles.buttonWrapper}>
           <TouchableOpacity
             style={styles.button}
-            
+            onPress={() => router.push("/address")}
           >
-            <Ionicons name="settings-outline" size={20} color={Colors.black} />
-            <Text style={styles.buttonTxt}>Setting</Text>
+            <Ionicons name="location-outline" size={20} color={Colors.black} />
+            <Text style={styles.buttonTxt}>Address</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.buttonWrapper}>
@@ -120,7 +120,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 100,
   },
   avatar: {
     width: 100,

@@ -1,5 +1,5 @@
 export interface ProductType {
-  id: number;
+  id: string;
   title: string;
   price: number;
   description: string;
@@ -19,6 +19,7 @@ export interface ProductType {
   };
 }
 
+
 interface Category {
   id: number;
   name: string;
@@ -32,11 +33,13 @@ export interface CategoryType {
 }
 
 export interface CartItemType {
+  _id: string  // Thêm nếu thiếu
   id: number;
+  productId: string; // Thêm productId nếu cần
   title: string;
   price: number;
   quantity: number;
-  image: string;
+  images: string;
 }
 
 export interface NotificationType {
@@ -44,4 +47,28 @@ export interface NotificationType {
   title: string;
   message: string;
   timestamp: string;
+}
+
+
+export interface Order {
+  _id: string;
+  totalAmount: number;
+  status: string;
+  createdAt: string;
+  address: {
+      fullName: string;
+      phone: string;
+      addressLine: string;
+      city: string;
+      state: string;
+      country: string;
+  };
+  products: {
+      productId: string;
+      title: string;
+      quantity: number;
+      price: number;
+      image: string;
+      _id: string;
+  }[];
 }
