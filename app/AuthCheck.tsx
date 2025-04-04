@@ -13,7 +13,7 @@ export default function AuthCheck() {
 
         if (token) {
           // console.log("🔹 Token từ AsyncStorage:", token);
-          router.replace("/main-tabs"); // Điều hướng sau khi token load xong
+          router.replace("/(tabs)"); // Điều hướng sau khi token load xong
         } else {
           router.replace("/welcome"); // Nếu không có token thì về màn hình welcome
         }

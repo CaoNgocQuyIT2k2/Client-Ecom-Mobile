@@ -103,3 +103,22 @@ export const requestCancelOrder = async (idOrder: string, reason: string) => {
     throw new Error(errorMessage)
   }
 }
+
+
+export const getOrderDetails = async (orderId: string) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken')
+    if (!token) throw new Error('User not authenticated')
+
+    const response = await axios.get(`${BASE_URL}/order/details/${orderId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    return response.data.data
+  } catch (error) {
+    console.error('❌ Error getting order details:', error)
+    throw error
+  }
+}

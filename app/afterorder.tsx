@@ -32,7 +32,7 @@ const AfterOrder = () => {
           ShopQ protects your rights - DO NOT TRANSFER MONEY IN ADVANCE to the Shipper when the order has not been delivered.
         </Text>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.secondaryButton} onPress={() => router.push("/main-tabs")}>
+          <TouchableOpacity style={styles.secondaryButton} onPress={() => router.push("/(tabs)")}>
             <Text style={styles.buttonText}>Back to Home</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.primaryButton} onPress={() => router.push("/order")} >

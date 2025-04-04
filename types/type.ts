@@ -1,4 +1,5 @@
 export interface ProductType {
+  _id: string;
   id: string;
   title: string;
   price: number;
@@ -72,3 +73,38 @@ export interface Order {
       _id: string;
   }[];
 }
+
+
+export type RecentlyViewedProduct = {
+  _id: string;
+  IdUser: number;
+  title: string;
+  price: number;
+  image: string;
+  viewedAt: string;
+  productId: {
+    _id: string;
+    id: string;
+    title: string;
+    price: number;
+    description: string;
+    images: string[];
+    category: {
+      id: number;
+      name: string;
+      image: string;
+    };
+    ratings: {
+      stars: {
+        1: number;
+        2: number;
+        3: number;
+        4: number;
+        5: number;
+      };
+      totalRatings: number;
+      average: number;
+    };
+    soldCount: number;
+  };
+};

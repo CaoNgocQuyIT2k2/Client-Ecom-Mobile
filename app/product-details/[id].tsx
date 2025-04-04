@@ -17,11 +17,14 @@ import { Ionicons } from '@expo/vector-icons'
 import { Colors } from '@/constants/Colors'
 import { useHeaderHeight } from '@react-navigation/elements'
 import Animated, { FadeInDown, SlideInDown } from 'react-native-reanimated'
+import ThreeLatestProductReviews from '@/components/ThreeLatestProductReviews';
+import SimilarProducts from '@/components/SimilarProducts';
 
 const ProductDetails = () => {
   const { id } = useLocalSearchParams() // Get id from URL
   const [product, setProduct] = useState<ProductType | null>(null)
   const [cartCount, setCartCount] = useState(0); // State to store cart item count
+
 
   useEffect(() => {
     getProductDetails();
@@ -108,7 +111,7 @@ const ProductDetails = () => {
             </TouchableOpacity>
           ),
           headerRight: () => (
-            <TouchableOpacity onPress={() => router.push('/main-tabs/cart')}>
+            <TouchableOpacity onPress={() => router.push('/(tabs)/cart')}>
               <View>
                 <Ionicons name="cart-outline" size={24} color={Colors.black} />
                 {cartCount > 0 && (
@@ -136,7 +139,7 @@ const ProductDetails = () => {
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Ionicons name="star" size={20} color={'#D4AF37'} />
                 <Text style={styles.rating}>
-                  {product.ratings.average} <Text>({product.soldCount})</Text>
+                  {product.ratings.average.toFixed(1)} <Text>({product.soldCount})</Text>
                 </Text>
               </View>
               <TouchableOpacity>
@@ -154,8 +157,13 @@ const ProductDetails = () => {
               </Text>
             </Animated.View>
             <Animated.Text entering={FadeInDown.delay(1100).duration(500)} style={styles.description}>{product.description}</Animated.Text>
+            {/* {product && <ThreeLatestProductReviews productId={product._id} />} */}
+            <ThreeLatestProductReviews productId={product?._id ?? ''} />
+            {product && <SimilarProducts productId={product._id} />}
           </View>
         )}
+
+
       </ScrollView>
       <Animated.View entering={SlideInDown.delay(500).duration(500)} style={styles.buttonWrapper}>
         <TouchableOpacity

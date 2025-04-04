@@ -58,13 +58,13 @@ const ProfileScreen = () => {
           <Text style={styles.userName}>{userData.username}</Text>
         </View>
         <View style={styles.buttonWrapper}>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button}  onPress={() =>router.push('/profile')}>
             <Ionicons name="person-outline" size={20} color={Colors.black} />
-            <Text style={styles.buttonTxt}>Your Orders</Text>
+            <Text style={styles.buttonTxt}>Your Info</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.buttonWrapper}>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={() =>router.push('/wishlistscreen')}>
             <Ionicons name="heart-outline" size={20} color={Colors.black} />
             <Text style={styles.buttonTxt}>Your Wishlist</Text>
           </TouchableOpacity>
@@ -82,9 +82,9 @@ const ProfileScreen = () => {
           </TouchableOpacity>
         </View>
         <View style={styles.buttonWrapper}>
-          <TouchableOpacity style={styles.button}>
-            <Ionicons name="help-circle-outline" size={20} color={Colors.black} />
-            <Text style={styles.buttonTxt}>Customer Support</Text>
+          <TouchableOpacity style={styles.button} onPress={() =>router.push('/viewedproducts')}>
+            <Ionicons name="eye-outline" size={20} color={Colors.black} />
+            <Text style={styles.buttonTxt}>Viewed Product</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.buttonWrapper}>
@@ -120,6 +120,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
+    margin: 2,
   },
   avatar: {
     width: 100,
@@ -135,11 +136,12 @@ const styles = StyleSheet.create({
   buttonWrapper: {
     marginTop: 20,
     gap: 10,
+    
   },
   button: {
     padding: 10,
     borderColor: Colors.lightGray,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderRadius: 5,
     flexDirection: "row",
     alignItems: "center",

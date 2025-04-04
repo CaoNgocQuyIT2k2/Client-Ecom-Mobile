@@ -10,13 +10,25 @@ import {
   Alert,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { cancelOrder, getUserOrdersByStatus } from '@/services/orderService'
+import { cancelOrder, getOrderDetails, getUserOrdersByStatus } from '@/services/orderService'
 import { Colors } from '@/constants/Colors'
+import OrderDetailsModal from '@/components/OrderDetailsModal'
 
 export default function IndexScreen() {
   const [confirmedOrders, setConfirmedOrders] = useState<any[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-
+  const [modalVisible, setModalVisible] = useState(false)
+  const [selectedProducts, setSelectedProducts] = useState([])
+  
+  const handleViewMore = async (orderId: string) => {
+    try {
+      const response = await getOrderDetails(orderId)
+      setSelectedProducts(response.data.products)
+      setModalVisible(true)
+    } catch (err) {
+      console.error('❌ Error loading order details:', err)
+    }
+  }
   const recommendedProducts = [
     {
       id: '101',
@@ -108,11 +120,15 @@ export default function IndexScreen() {
                   </Text>
                   <Text style={styles.status}>Pending</Text>
 
-                  {item.products.length > 1 && (
-                    <TouchableOpacity style={styles.viewMoreButton}>
-                      <Text style={styles.viewMoreText}>See More</Text>
-                    </TouchableOpacity>
-                  )}
+                 {item.products.length > 1 && (
+  <TouchableOpacity
+    style={styles.viewMoreButton}
+    onPress={() => handleViewMore(item._id)}
+  >
+    <Text style={styles.viewMoreText}>See More</Text>
+  </TouchableOpacity>
+)}
+
 
                   <View
                     style={{
@@ -160,6 +176,12 @@ export default function IndexScreen() {
           />
         </>
       )}
+      <OrderDetailsModal
+  visible={modalVisible}
+  onClose={() => setModalVisible(false)}
+  products={selectedProducts}
+/>
+
     </View>
   )
 }

@@ -6,7 +6,6 @@ import * as SplashScreen from 'expo-splash-screen'
 import { NavigationContainer } from '@react-navigation/native'
 import { store } from '@/redux/store'
 import { Provider } from 'react-redux';
-
 SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
@@ -45,13 +44,13 @@ export default function RootLayout() {
   if (!isAuthenticated) {
     return <Redirect href="/signin" />
   }
-
+  LogBox.ignoreLogs(['VirtualizedLists should never be nested']); // ✅ Ẩn cảnh báo
   return ( 
      <Provider store={store}>
     <NavigationContainer>
       <Stack screenOptions={{ headerShown: false }}>
         {/* Tabs chính chứa Home, Profile, Explore,... */}
-        <Stack.Screen name="main-tabs" />
+        <Stack.Screen name="(tabs)" />
 
         {/* Màn hình Product Details - Đặt trong Stack để có header */}
         <Stack.Screen
@@ -91,6 +90,11 @@ export default function RootLayout() {
           options={{ headerTitle: 'Edit Address' }}
         />
         <Stack.Screen name="checkout" options={{ headerTitle: 'Check Out' }} />
+        <Stack.Screen name="reviewproduct" options={{ headerTitle: 'Review Product' }} />
+        <Stack.Screen name="allreviewscreen" options={{ headerTitle: 'All Review Product' }} />
+        <Stack.Screen name="wishlistscreen" options={{ headerTitle: 'Wishlist' }} />
+        <Stack.Screen name="viewedproducts" options={{ headerTitle: 'Viewed Product' }} />
+        <Stack.Screen name="coupons" options={{ headerTitle: 'Coupons' }} />
       </Stack>
     </NavigationContainer>
     </Provider>

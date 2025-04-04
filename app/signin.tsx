@@ -31,7 +31,7 @@ const SignInScreen = () => {
       // console.log("✅ Login successful:", userData);
 
       // Navigate to the main screen
-      router.replace("/main-tabs");
+      router.replace("/(tabs)");
     } catch (error: any) {
       console.error("❌ Login error:", error);
       Alert.alert("Login Error", error.message);

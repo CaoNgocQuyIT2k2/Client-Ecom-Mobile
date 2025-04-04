@@ -158,11 +158,15 @@ const CartScreen = () => {
             color={Colors.primary}
           />
         </TouchableOpacity>
-
-        <Image source={{ uri: item.images[0] }} style={styles.itemImg} />
+            <TouchableOpacity onPress={() => router.push({ pathname: "/product-details/[id]", params: { id: item.id } })}>
+            <Image source={{ uri: item.images[0] }} style={styles.itemImg} />
+            </TouchableOpacity>
 
         <View style={styles.itemInfoWrapper}>
+        <TouchableOpacity onPress={() => router.push({ pathname: "/product-details/[id]", params: { id: item.id } })}>
           <Text style={styles.itemText}>{item.title}</Text>
+          </TouchableOpacity>
+
           <Text style={styles.itemPrice}>${item.price}</Text>
 
           <View style={styles.itemControlWrapper}>

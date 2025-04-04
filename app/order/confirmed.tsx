@@ -13,11 +13,13 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
   cancelOrder,
+  getOrderDetails,
   getUserOrdersByStatus,
   requestCancelOrder,
 } from '@/services/orderService'
 import { Colors } from '@/constants/Colors'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
+import OrderDetailsModal from '@/components/OrderDetailsModal'
 
 export default function ConfirmedScreen() {
   const [confirmedOrders, setConfirmedOrders] = useState<any[]>([])
@@ -28,7 +30,18 @@ export default function ConfirmedScreen() {
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
   const [selectedReason, setSelectedReason] = useState<string>('')
   const [selectedStatus, setSelectedStatus] = useState("Confirmed"); 
-
+  const [modalVisible1, setModalVisible1] = useState(false)
+  const [selectedProducts, setSelectedProducts] = useState([])
+  
+  const handleViewMore = async (orderId: string) => {
+    try {
+      const response = await getOrderDetails(orderId)
+      setSelectedProducts(response.data.products)
+      setModalVisible1(true)
+    } catch (err) {
+      console.error('❌ Error loading order details:', err)
+    }
+  }
   const cancellationReasons = [
     'Đổi ý không muốn mua',
     'Tìm thấy giá rẻ hơn',
@@ -150,11 +163,15 @@ export default function ConfirmedScreen() {
                       : item.status}
                   </Text>
 
-                  {item.products.length > 1 && (
-                    <TouchableOpacity style={styles.viewMoreButton}>
-                      <Text style={styles.viewMoreText}>See More</Text>
-                    </TouchableOpacity>
-                  )}
+                 {item.products.length > 1 && (
+  <TouchableOpacity
+    style={styles.viewMoreButton}
+    onPress={() => handleViewMore(item._id)}
+  >
+    <Text style={styles.viewMoreText}>See More</Text>
+  </TouchableOpacity>
+)}
+
 
                   <View
                     style={{
@@ -202,49 +219,55 @@ export default function ConfirmedScreen() {
           />
         </>
       )}
+<OrderDetailsModal
+  visible={modalVisible1}
+  onClose={() => setModalVisible1(false)}
+  products={selectedProducts}
+/>
 
       {/* 🛑 Modal chọn lý do hủy đơn hàng */}
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Chọn lý do hủy đơn hàng</Text>
-            {cancellationReasons.map((reason) => (
-              <TouchableOpacity
-                key={reason}
-                style={styles.reasonOption}
-                onPress={() => setSelectedReason(reason)} // ✅ Chỉ cho phép chọn 1 lý do
-              >
-                <MaterialCommunityIcons
-                  name={
-                    selectedReason === reason
-                      ? 'checkbox-marked'
-                      : 'checkbox-blank-outline'
-                  }
-                  size={20}
-                  color={selectedReason === reason ? Colors.primary : 'gray'}
-                />
-                <Text style={styles.reasonText}>{reason}</Text>
-              </TouchableOpacity>
-            ))}
+<Modal animationType="slide" transparent={true} visible={modalVisible}>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+      <Text style={styles.modalTitle}>Select a reason to cancel the order</Text>
+      {cancellationReasons.map((reason) => (
+        <TouchableOpacity
+          key={reason}
+          style={styles.reasonOption}
+          onPress={() => setSelectedReason(reason)} // ✅ Allow selecting only one reason
+        >
+          <MaterialCommunityIcons
+            name={
+              selectedReason === reason
+                ? 'checkbox-marked'
+                : 'checkbox-blank-outline'
+            }
+            size={20}
+            color={selectedReason === reason ? Colors.primary : 'gray'}
+          />
+          <Text style={styles.reasonText}>{reason}</Text>
+        </TouchableOpacity>
+      ))}
 
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={styles.cancelModalButton}
-                onPress={() => setModalVisible(false)}
-              >
-                <Text style={styles.cancelText}>Hủy</Text>
-              </TouchableOpacity>
+      <View style={styles.modalButtons}>
+        <TouchableOpacity
+          style={styles.cancelModalButton}
+          onPress={() => setModalVisible(false)}
+        >
+          <Text style={styles.cancelText}>Cancel</Text>
+        </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.confirmCancelButton}
-                onPress={handleCancelOrder}
-              >
-                <Text style={styles.confirmCancelText}>Xác nhận</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+        <TouchableOpacity
+          style={styles.confirmCancelButton}
+          onPress={handleCancelOrder}
+        >
+          <Text style={styles.confirmCancelText}>Confirm</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
+
     </View>
   )
 }

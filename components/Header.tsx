@@ -33,9 +33,9 @@ const Header: React.FC<HeaderProps> = ({ searchInputRef }) => {
 
   const handleSearch = () => {
     if (searchText.trim()) {
-      router.push(`/main-tabs/explore?key=${encodeURIComponent(searchText)}`);
+      router.push(`/(tabs)/explore?key=${encodeURIComponent(searchText)}`);
     } else {
-      router.push(`/main-tabs/explore`);
+      router.push(`/(tabs)/explore`);
     }
   };
 
@@ -55,7 +55,7 @@ const Header: React.FC<HeaderProps> = ({ searchInputRef }) => {
   onChangeText={setSearchText}
   onFocus={() => {
     if (segments?.[1] !== "explore") {
-      router.push("/main-tabs/explore");
+      router.push("/(tabs)/explore");
     }
   }}
   
@@ -74,7 +74,7 @@ const Header: React.FC<HeaderProps> = ({ searchInputRef }) => {
         <TouchableOpacity>
           <Ionicons name="notifications-outline" size={24} color={Colors.primary} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/main-tabs/profile")}>
+        <TouchableOpacity onPress={() => router.push("/(tabs)/profile")}>
           <Image source={{ uri: avatar }} style={styles.avatar} />
         </TouchableOpacity>
       </View>

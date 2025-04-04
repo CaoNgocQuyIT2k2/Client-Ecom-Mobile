@@ -1,25 +1,21 @@
 import {
   ActivityIndicator,
-  FlatList,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import axios from 'axios'
 
 import { CategoryType, ProductType } from '@/types/type'
-import { Stack, useNavigation } from 'expo-router'
+import { Stack, useNavigation, useFocusEffect } from 'expo-router'
 import Header from '@/components/Header'
-import ProductItem from '@/components/ProductItem'
-import { TouchableOpacity } from 'react-native-gesture-handler'
-import { Colors } from '@/constants/Colors'
 import Categories from '@/components/Categories'
-import { BASE_URL } from '@/constants/api'
 import Top10Sold from '@/components/Top10Sold'
 import BannerCarousel from '@/components/BannerCarousel'
 import ProductList from '@/components/ProducList'
+import { Colors } from '@/constants/Colors'
+import { BASE_URL } from '@/constants/api'
 
 const HomeScreen = () => {
   const [products, setProducts] = useState<ProductType[]>([])
@@ -31,35 +27,37 @@ const HomeScreen = () => {
 
   const navigation = useNavigation()
 
-  useEffect(() => {}, [navigation])
+  // Hook này sẽ gọi lại các API khi màn hình được focus
+  useFocusEffect(
+    useCallback(() => {
+      // Gọi lại các hàm mỗi khi màn hình được focus
+      getCategories()
+      getProducts(1) // Load lại trang đầu tiên
+      getTop10Sold()
 
-  useEffect(() => {
-    getCategories()
-    getProducts(1) // Load trang đầu tiên
-    getTop10Sold()
-  }, [])
+    }, []) // Chỉ gọi lại khi màn hình được focus
+  )
 
   // Gọi API sản phẩm có phân trang
-const getProducts = async (pageNumber: number) => {
-  if (pageNumber === 1) setIsLoading(true);
-  else setIsLoadingMore(true);
+  const getProducts = async (pageNumber: number) => {
+    if (pageNumber === 1) setIsLoading(true)
+    else setIsLoadingMore(true)
 
-  try {
-    // console.log(`🔹 Fetching page ${pageNumber}`);
-    const response = await axios.get(`${BASE_URL}/products/products?page=${pageNumber}`);
-    if (pageNumber === 1) {
-      setProducts(response.data); // Load trang đầu tiên
-    } else {
-      setProducts((prev) => [...prev, ...response.data]); // Load tiếp dữ liệu mới
+    try {
+      const response = await axios.get(`${BASE_URL}/products/products?page=${pageNumber}`)
+      if (pageNumber === 1) {
+        setProducts(response.data) // Load trang đầu tiên
+      } else {
+        setProducts((prev) => [...prev, ...response.data]) // Load tiếp dữ liệu mới
+      }
+      setPage(pageNumber + 1) // Tăng page để lần sau gọi tiếp
+    } catch (error) {
+      console.error('❌ Error fetching products:', error)
+    } finally {
+      if (pageNumber === 1) setIsLoading(false)
+      setIsLoadingMore(false)
     }
-    setPage(pageNumber + 1); // Tăng page để lần sau gọi tiếp
-  } catch (error) {
-    console.error('❌ Error fetching products:', error);
-  } finally {
-    if (pageNumber === 1) setIsLoading(false);
-    setIsLoadingMore(false);
   }
-};
 
   // Gọi API danh mục
   const getCategories = async () => {
@@ -101,7 +99,6 @@ const getProducts = async (pageNumber: number) => {
           header: () => <Header />,
         }}
       />
-
       <ScrollView>
         <BannerCarousel />
         <Categories categories={categories} />
