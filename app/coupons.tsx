@@ -53,29 +53,32 @@ const CouponScreen = ({ route }: { route?: any }) => {
   // Use parsedTotalAmount instead of totalAmount
   const handleApplyCoupon = async () => {
     if (!selectedCoupon) {
-      Alert.alert('Notification', 'Please select a discount code')
+      // Trường hợp không chọn mã giảm giá => quay lại màn checkout không truyền gì
+      router.push('/checkout')
       return
     }
   
     try {
       const response = await applyCoupon(selectedCoupon.code, parsedTotalAmount)
-        // Calculate the discount amount
-    const discountAmount = (parsedTotalAmount * response.discount) / 100
+      const discountAmount = (parsedTotalAmount * response.discount) / 100
+  
       Alert.alert(
         'Success',
         `Discount: ${response.discount}% - New total amount: ${response.finalAmount}`
       )
+  
       router.push({
         pathname: '/checkout',
-        params: { 
-          finalAmount: response.finalAmount,  // Amount after discount
-          discountAmount: discountAmount // Discount amount
+        params: {
+          finalAmount: response.finalAmount,
+          discountAmount: discountAmount,
         },
       })
     } catch (error) {
       Alert.alert('Error', 'Unable to apply the discount code')
     }
   }
+  
   
 
   return (
@@ -119,6 +122,13 @@ const CouponScreen = ({ route }: { route?: any }) => {
         <TouchableOpacity style={styles.applyButton} onPress={handleApplyCoupon}>
           <Text style={styles.buttonText}>OK</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+  style={[styles.applyButton, { backgroundColor: '#ccc', marginTop: 10 }]}
+  onPress={() => router.push('/checkout')}
+>
+  <Text style={[styles.buttonText, { color: '#000' }]}>Skip voucher</Text>
+</TouchableOpacity>
+
       </View>
     </>
   )

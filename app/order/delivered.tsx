@@ -14,6 +14,9 @@ import { Colors } from '@/constants/Colors'
 import { useRouter } from 'expo-router'
 import { checkReviewStatus } from '@/services/reviewService'
 import OrderDetailsModal from '@/components/OrderDetailsModal'
+import { Buffer } from 'buffer';
+
+
 export default function DeliveredScreen() {
   const [confirmedOrders, setConfirmedOrders] = useState<any[]>([])
   const [loading, setLoading] = useState<boolean>(true)
@@ -59,7 +62,11 @@ export default function DeliveredScreen() {
         const token = await AsyncStorage.getItem('authToken')
         if (!token) throw new Error('Không tìm thấy token')
 
-        const decoded = JSON.parse(atob(token.split('.')[1])) // Decode JWT lấy idUser
+            // Giải mã JWT an toàn từ base64url
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const decoded = JSON.parse(Buffer.from(base64, 'base64').toString('utf-8'))
+ // Decode JWT lấy idUser
         setUserId(decoded.idUser)
 
         // Lấy danh sách đơn hàng đã giao

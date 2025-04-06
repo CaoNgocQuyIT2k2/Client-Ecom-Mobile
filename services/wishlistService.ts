@@ -1,13 +1,19 @@
 import axios from 'axios'
 import { BASE_URL } from '@/constants/api'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { decode as atob } from 'base-64'   // thư viện hỗ trợ React Native
+import { Buffer } from 'buffer';
 
 export const toggleWishlist = async (productId: string) => {
   try {
     const token = await AsyncStorage.getItem('authToken')
     if (!token) throw new Error('User not authenticated')
 
-    const decoded = JSON.parse(atob(token.split('.')[1]))
+        // Giải mã JWT an toàn từ base64url
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const decoded = JSON.parse(Buffer.from(base64, 'base64').toString('utf-8'))
+
     const idUser = decoded.idUser // Lấy idUser từ token
 
     console.log('Sending request to toggle wishlist', { idUser, productId })
@@ -40,18 +46,23 @@ export const toggleWishlist = async (productId: string) => {
 
 
 export const getWishlist = async () => {
-    const token = await AsyncStorage.getItem('authToken')
-    if (!token) throw new Error('User not authenticated')
+  const token = await AsyncStorage.getItem('authToken')
+  if (!token) throw new Error('User not authenticated')
 
-    const decoded = JSON.parse(atob(token.split('.')[1]))
-    const idUser = decoded.idUser // Lấy idUser từ token
-    try {
-      const response = await axios.get(
-        `${BASE_URL}/wishlist/getWishlist/${idUser}`
-      )
-      return response.data
-    } catch (error) {
-      console.error('❌ Error fetching wishlist:', error)
-      throw error
-    }
+  try {
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const padded = base64.padEnd(base64.length + (4 - (base64.length % 4)) % 4, '=')
+
+    const decoded = JSON.parse(atob(padded))
+    const idUser = decoded.idUser
+
+    const response = await axios.get(`${BASE_URL}/wishlist/getWishlist/${idUser}`)
+    return response.data
+  } catch (error) {
+    console.error('❌ Error fetching wishlist:', error)
+    throw error
   }
+}
+
+  

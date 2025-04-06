@@ -3,6 +3,8 @@
 import { BASE_URL } from '@/constants/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { Buffer } from 'buffer';
+import { decode as atob } from 'base-64'   // thư viện hỗ trợ React Native
 
 // Lấy danh sách mã giảm giá của người dùng
 export const getUserCoupons = async () => {
@@ -10,7 +12,11 @@ export const getUserCoupons = async () => {
       const token = await AsyncStorage.getItem('authToken');
       if (!token) throw new Error('User not authenticated');
   
-      const decoded = JSON.parse(atob(token.split('.')[1]));
+          // Giải mã JWT an toàn từ base64url
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const decoded = JSON.parse(Buffer.from(base64, 'base64').toString('utf-8'))
+;
       const idUser = decoded.idUser;
   
       const response = await axios.get(`${BASE_URL}/coupon/${idUser}`, {
@@ -35,7 +41,11 @@ export const applyCoupon = async (code: string, totalAmount: number) => {
       const token = await AsyncStorage.getItem('authToken');
       if (!token) throw new Error('User not authenticated');
   
-      const decoded = JSON.parse(atob(token.split('.')[1]));
+          // Giải mã JWT an toàn từ base64url
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const decoded = JSON.parse(Buffer.from(base64, 'base64').toString('utf-8'))
+;
       const idUser = decoded.idUser;
   
       const response = await axios.post(

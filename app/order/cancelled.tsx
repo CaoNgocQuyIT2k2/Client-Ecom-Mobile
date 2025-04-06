@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { getOrderDetails, getUserOrdersByStatus } from '@/services/orderService'
 import { Colors } from '@/constants/Colors'
 import OrderDetailsModal from '@/components/OrderDetailsModal'
+import { Buffer } from 'buffer';
 
 export default function CancelledScreen() {
   const [confirmedOrders, setConfirmedOrders] = useState<any[]>([])
@@ -52,7 +53,11 @@ export default function CancelledScreen() {
         const token = await AsyncStorage.getItem('authToken')
         if (!token) throw new Error('Không tìm thấy token')
 
-        const decoded = JSON.parse(atob(token.split('.')[1])) // Decode JWT để lấy idUser
+            // Giải mã JWT an toàn từ base64url
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const decoded = JSON.parse(Buffer.from(base64, 'base64').toString('utf-8'))
+ // Decode JWT để lấy idUser
 
         // Lấy danh sách New Order
         const orders = await getUserOrdersByStatus(

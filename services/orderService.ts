@@ -2,6 +2,8 @@ import axios from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { BASE_URL } from '@/constants/api'
 import { Order } from '@/types/type'
+import { Buffer } from 'buffer'
+import { decode as atob } from 'base-64' // thư viện hỗ trợ React Native
 
 export const createOrder = async (orderData: any) => {
   try {
@@ -104,7 +106,6 @@ export const requestCancelOrder = async (idOrder: string, reason: string) => {
   }
 }
 
-
 export const getOrderDetails = async (orderId: string) => {
   try {
     const token = await AsyncStorage.getItem('authToken')
@@ -120,5 +121,26 @@ export const getOrderDetails = async (orderId: string) => {
   } catch (error) {
     console.error('❌ Error getting order details:', error)
     throw error
+  }
+}
+
+export const getRewardPoints = async () => {
+  try {
+    const token = await AsyncStorage.getItem('authToken')
+    if (!token) throw new Error('User not authenticated')
+
+    // Giải mã JWT an toàn từ base64url
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const decoded = JSON.parse(Buffer.from(base64, 'base64').toString('utf-8'))
+    const idUser = decoded.idUser
+
+    const response = await axios.get(
+      `${BASE_URL}/rewardPoints/getRewardPoints/${idUser}`
+    )
+    return response.data.rewardPoints // Trả về giá trị rewardPoints
+  } catch (error) {
+    console.error('Error fetching reward points:', error)
+    throw new Error('Could not fetch reward points from API')
   }
 }

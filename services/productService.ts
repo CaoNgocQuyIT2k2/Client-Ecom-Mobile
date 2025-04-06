@@ -2,6 +2,7 @@ import { BASE_URL } from '@/constants/api'
 import { ProductType } from '@/types/type';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios'
+import { Buffer } from 'buffer';
 
 export const getProductDetails = async (id: string) => {
     try {
@@ -32,7 +33,11 @@ export const saveRecentlyViewed = async (productId: string) => {
     if (!token) throw new Error('User not authenticated');
 
     // Giải mã token để lấy idUser
-    const decoded = JSON.parse(atob(token.split('.')[1]));
+        // Giải mã JWT an toàn từ base64url
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const decoded = JSON.parse(Buffer.from(base64, 'base64').toString('utf-8'))
+;
     const idUser = decoded.idUser; // Lấy idUser từ token
 
     console.log('Sending request to save recently viewed', { idUser, productId });
@@ -70,7 +75,11 @@ export const getRecentlyViewed = async () => {
     if (!token) throw new Error('User not authenticated');
 
     // Giải mã token để lấy idUser
-    const decoded = JSON.parse(atob(token.split('.')[1]));
+        // Giải mã JWT an toàn từ base64url
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const decoded = JSON.parse(Buffer.from(base64, 'base64').toString('utf-8'))
+;
     const idUser = decoded.idUser;
 
     const response = await axios.get(`${BASE_URL}/recentlyViewed/getRecentlyViewed/${idUser}`, {

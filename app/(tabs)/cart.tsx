@@ -139,6 +139,22 @@ const CartScreen = () => {
     return sum
   }, 0)
 
+  const toggleSelectAll = async () => {
+    let updatedItems: CartItemType[] = []
+  
+    if (selectedItems.length === cartItems.length) {
+      // Deselect all
+      updatedItems = []
+    } else {
+      // Select all
+      updatedItems = cartItems
+    }
+  
+    dispatch(setSelectedItems(updatedItems))
+    await AsyncStorage.setItem('selectedItems', JSON.stringify(updatedItems))
+  }
+  
+  
   const CartItem = ({ item }: { item: CartItemType }) => {
     const isSelected = selectedItems.some((selected) => selected.id === item.id)
 
@@ -228,6 +244,25 @@ const CartScreen = () => {
     <>
       <Stack.Screen options={{ headerShown: true, headerTransparent: true }} />
       <View style={[styles.container, { marginTop: headerHeight }]}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+  <TouchableOpacity onPress={toggleSelectAll} style={{ marginRight: 10 }}>
+    <Ionicons
+      name={
+        selectedItems.length === cartItems.length && cartItems.length > 0
+          ? 'checkbox-outline'
+          : 'square-outline'
+      }
+      size={24}
+      color={Colors.primary}
+    />
+  </TouchableOpacity>
+  <Text style={{ fontSize: 16, fontWeight: '500' }}>
+    {selectedItems.length === cartItems.length && cartItems.length > 0
+      ? 'Deselect All'
+      : 'Select All'}
+  </Text>
+</View>
+
         <FlatList
           data={cartItems}
           keyExtractor={(item) => item.id.toString()}

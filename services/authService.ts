@@ -10,7 +10,6 @@ export const loginUser = async (emailOrUsername: string, password: string) => {
     });
 
     const userData = response.data;
-
     // Lưu token vào AsyncStorage
     if (userData.token) {
       await AsyncStorage.setItem("authToken", userData.token);
