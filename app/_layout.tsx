@@ -6,12 +6,19 @@ import * as SplashScreen from 'expo-splash-screen'
 import { NavigationContainer } from '@react-navigation/native'
 import { store } from '@/redux/store'
 import { Provider } from 'react-redux';
+import NotificationInitializer from './NotificationInitializer'
+import { PersistGate } from 'redux-persist/integration/react';
+import { persistor } from '@/redux/store'; // 👈 import persistor
+
 SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
   const [loading, setLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   LogBox.ignoreLogs(["AxiosError"])
+
+  
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -45,58 +52,31 @@ export default function RootLayout() {
     return <Redirect href="/signin" />
   }
   LogBox.ignoreLogs(['VirtualizedLists should never be nested']); // ✅ Ẩn cảnh báo
-  return ( 
-     <Provider store={store}>
-    <NavigationContainer>
-      <Stack screenOptions={{ headerShown: false }}>
-        {/* Tabs chính chứa Home, Profile, Explore,... */}
-        <Stack.Screen name="(tabs)" />
 
-        {/* Màn hình Product Details - Đặt trong Stack để có header */}
-        <Stack.Screen
-          name="product-details/[id]"
-          options={{ headerShown: true, title: 'Product Details',headerTitleAlign: "center" }}
-        />
 
-        {/* Màn hình Order - Đặt trong Stack để có header */}
-        <Stack.Screen
-          name="order"
-          options={{ headerShown: true, title: 'Orders' ,headerTitleAlign: "center"}}
-        />
 
-        {/* Các màn hình khác */}
-        {/* <Stack.Screen name="signin" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="signup" options={{ presentation: 'modal' }} />
-        <Stack.Screen
-          name="otpverify"
-          options={{ headerTitle: 'OTP Verification' }}
-        />
-        <Stack.Screen
-          name="forgotpassword"
-          options={{ headerTitle: 'Forgot Password' }}
-        />
-        <Stack.Screen
-          name="otppasswordverify"
-          options={{ headerTitle: 'OTP Verification' }}
-        />
-        <Stack.Screen
-          name="resetpassword"
-          options={{ headerTitle: 'Reset Password' }}
-        /> */}
-        <Stack.Screen name="address" options={{ headerTitle: 'My Address' }} />
-        <Stack.Screen name="afterorder"  />
-        <Stack.Screen
-          name="editaddress"
-          options={{ headerTitle: 'Edit Address' }}
-        />
-        <Stack.Screen name="checkout" options={{ headerTitle: 'Check Out' }} />
-        <Stack.Screen name="reviewproduct" options={{ headerTitle: 'Review Product' }} />
-        <Stack.Screen name="allreviewscreen" options={{ headerTitle: 'All Review Product' }} />
-        <Stack.Screen name="wishlistscreen" options={{ headerTitle: 'Wishlist' }} />
-        <Stack.Screen name="viewedproducts" options={{ headerTitle: 'Viewed Product' }} />
-        <Stack.Screen name="coupons" options={{ headerTitle: 'Coupons' }} />
-      </Stack>
-    </NavigationContainer>
-    </Provider>
-  )
+return (
+  <Provider store={store}>
+    <PersistGate loading={null} persistor={persistor}>
+      <NavigationContainer>
+        <NotificationInitializer />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="product-details/[id]" options={{ headerShown: true, title: 'Product Details', headerTitleAlign: 'center' }} />
+          <Stack.Screen name="order" options={{ headerShown: true, title: 'Orders', headerTitleAlign: 'center' }} />
+          {/* Các màn khác giữ nguyên */}
+          <Stack.Screen name="address" options={{ headerTitle: 'My Address' }} />
+          <Stack.Screen name="afterorder" />
+          <Stack.Screen name="editaddress" options={{ headerTitle: 'Edit Address' }} />
+          <Stack.Screen name="checkout" options={{ headerTitle: 'Check Out' }} />
+          <Stack.Screen name="reviewproduct" options={{ headerTitle: 'Review Product' }} />
+          <Stack.Screen name="allreviewscreen" options={{ headerTitle: 'All Review Product' }} />
+          <Stack.Screen name="wishlistscreen" options={{ headerTitle: 'Wishlist' }} />
+          <Stack.Screen name="viewedproducts" options={{ headerTitle: 'Viewed Product' }} />
+          <Stack.Screen name="coupons" options={{ headerTitle: 'Coupons' }} />
+        </Stack>
+      </NavigationContainer>
+    </PersistGate>
+  </Provider>
+);
 }

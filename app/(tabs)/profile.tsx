@@ -70,7 +70,7 @@ const ProfileScreen = () => {
           </TouchableOpacity>
         </View>
         <View style={styles.buttonWrapper}>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button}  onPress={() =>router.push('/orderchart')}>
             <Ionicons name="card-outline" size={20} color={Colors.black} />
             <Text style={styles.buttonTxt}>Payment History</Text>
           </TouchableOpacity>

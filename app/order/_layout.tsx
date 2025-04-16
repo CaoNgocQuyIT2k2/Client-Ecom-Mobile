@@ -7,6 +7,7 @@ import DeliveredScreen from './delivered'
 import CancelledScreen from './cancelled'
 import ConfirmedScreen from './confirmed'
 import { Colors } from '@/constants/Colors'
+import OrderChart from '../OrderChart'
 
 const Tab = createMaterialTopTabNavigator()
 
@@ -30,7 +31,6 @@ export default function OrderTabsLayout() {
       <Tab.Screen name="Preparing" component={PreparingScreen} />
       <Tab.Screen name="Shipping" component={ShippingScreen} />
       <Tab.Screen name="Delivered" component={DeliveredScreen} />
-      <Tab.Screen name="Cancelled" component={CancelledScreen} />
     </Tab.Navigator>
   )
 }

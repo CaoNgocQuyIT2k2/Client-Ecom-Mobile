@@ -1,89 +1,115 @@
-import { View, LayoutChangeEvent, StyleSheet } from "react-native";
-import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { Colors } from "@/constants/Colors";
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import { useEffect, useState } from "react";
-import TabBarButton from "./TabBarButton";
-import { icon } from "@/constants/icons";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import React, { useCallback, useEffect } from 'react';
+import { View, StyleSheet, Pressable, Text } from 'react-native';
+import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { Colors } from '@/constants/Colors';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchNotifications } from '@/redux/slices/notificationSlice';
+import { AppDispatch } from '@/redux/store';
+import { useFocusEffect } from 'expo-router';
 
 type TabBarProps = BottomTabBarProps & {
-  cartCount?: number; // ✅ Thêm cartCount vào props
+  cartCount?: number;
 };
 
 export function TabBar({ state, descriptors, navigation, cartCount = 0 }: TabBarProps) {
   const insets = useSafeAreaInsets();
-  const [dimensions, setDimensions] = useState({ height: 20, width: 100 });
 
-  const buttonWidth = dimensions.width / state.routes.length;
-  const tabPositionX = useSharedValue(0);
+  // Lấy thông báo từ Redux
+  const unreadCount = useSelector((state: any) => state.notification.unreadCount);
 
+  const dispatch = useDispatch<AppDispatch>();  // Đảm bảo dispatch có kiểu AppDispatch
+
+  // Fetch thông báo khi app được load lên lần đầu
   useEffect(() => {
-    tabPositionX.value = withTiming(buttonWidth * state.index, { duration: 200 });
-  }, [state.index, buttonWidth]); // Thêm `buttonWidth` để tránh lỗi kích thước chưa cập nhật
-  
+    dispatch(fetchNotifications());
+  }, [dispatch]);
 
-  const onTabBarLayout = (e: LayoutChangeEvent) => {
-    setDimensions({
-      height: e.nativeEvent.layout.height,
-      width: e.nativeEvent.layout.width,
-    });
+  // Khi focus vào tab sẽ gọi lại hàm fetchNotifications
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(fetchNotifications()); // Tự động gọi lại mỗi lần focus tab
+    }, [dispatch])
+  );
+
+  const getIconName = (routeName: string): 'home-outline' | 'notifications-outline' | 'cart-outline' | 'search-outline' | 'person-outline' => {
+    switch (routeName.toLowerCase()) {
+      case 'notifications':
+        return 'notifications-outline';
+      case 'cart':
+        return 'cart-outline';
+      case 'explore':
+        return 'search-outline';
+      case 'profile':
+        return 'person-outline';
+      case 'index':
+      default:
+        return 'home-outline';
+    }
   };
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: tabPositionX.value }],
-  }));
-
   return (
-    <View onLayout={onTabBarLayout} style={[styles.tabbar, { paddingBottom: insets.bottom }]}>
-      <Animated.View
-        style={[
-          animatedStyle,
-          {
-            position: "absolute",
-            backgroundColor: Colors.primary,
-            top: 0,
-            left: 20,
-            height: 2,
-            width: buttonWidth / 2,
-          },
-        ]}
-      />
+    <View style={[styles.tabbar, { paddingBottom: insets.bottom }]}>
       {state.routes.map((route, index) => {
-        if (!(route.name in icon)) return null;
-
         const { options } = descriptors[route.key];
         const label =
-          typeof options.tabBarLabel === "string" ? options.tabBarLabel : options.title ?? route.name;
+          typeof options.tabBarLabel === 'string'
+            ? options.tabBarLabel
+            : options.title ?? route.name;
 
         const isFocused = state.index === index;
+        const iconName = getIconName(route.name);
 
         const onPress = () => {
           const event = navigation.emit({
-            type: "tabPress",
+            type: 'tabPress',
             target: route.key,
             canPreventDefault: true,
           });
 
           if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name, route.params);
+            navigation.navigate(route.name);
           }
         };
 
         const onLongPress = () => {
-          navigation.emit({ type: "tabLongPress", target: route.key });
+          navigation.emit({
+            type: 'tabLongPress',
+            target: route.key,
+          });
         };
 
         return (
-          <TabBarButton
+          <Pressable
             key={route.name}
             onPress={onPress}
             onLongPress={onLongPress}
-            isFocused={isFocused}
-            label={label}
-            routeName={route.name as keyof typeof icon}
-            cartCount={route.name === "cart" ? cartCount : 0} // ✅ Truyền cartCount vào Cart tab
-          />
+            style={styles.tabbarBtn}
+          >
+            <View>
+              <Ionicons
+                name={iconName}
+                size={24}
+                color={isFocused ? Colors.primary : Colors.black}
+              />
+
+              {/* Hiển thị chấm đỏ nếu có thông báo chưa đọc */}
+              {route.name.toLowerCase() === 'notifications' && unreadCount > 0 && (
+                <View style={styles.dot} />
+              )}
+
+              {/* Hiển thị badge cho giỏ hàng */}
+              {route.name.toLowerCase() === 'cart' && cartCount > 0 && (
+                <View style={styles.badgeWrapper}>
+                  <Text style={styles.badgeText}>{cartCount}</Text>
+                </View>
+              )}
+            </View>
+            <Text style={{ color: isFocused ? Colors.primary : Colors.black }}>
+              {label}
+            </Text>
+          </Pressable>
         );
       })}
     </View>
@@ -92,10 +118,39 @@ export function TabBar({ state, descriptors, navigation, cartCount = 0 }: TabBar
 
 const styles = StyleSheet.create({
   tabbar: {
-    flexDirection: "row",
+    flexDirection: 'row',
     paddingTop: 16,
     paddingBottom: 15,
     backgroundColor: Colors.white,
-
+  },
+  tabbarBtn: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 5,
+  },
+  dot: {
+    position: 'absolute',
+    top: -2,
+    right: -6,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'red',
+  },
+  badgeWrapper: {
+    position: 'absolute',
+    backgroundColor: Colors.highlight,
+    top: -5,
+    right: 20,
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    borderRadius: 10,
+    zIndex: 10,
+  },
+  badgeText: {
+    color: Colors.black,
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 });

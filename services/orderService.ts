@@ -144,3 +144,36 @@ export const getRewardPoints = async () => {
     throw new Error('Could not fetch reward points from API')
   }
 }
+
+export const fetchOrderSummary = async (userId: number, range = 'all', groupBy: 'week' | 'month' | 'year' = 'month') => {
+  try {
+    const token = await AsyncStorage.getItem('authToken')
+    const res = await axios.get(`${BASE_URL}/order/summary/${userId}?range=${range}&groupBy=${groupBy}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    return res.data
+  } catch (err) {
+    console.error('Fetch summary error:', err)
+    throw err
+  }
+}
+
+export const fetchOrderStats = async (userId: number) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken')
+  const res = await axios.get(`${BASE_URL}/order/stats/${userId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  })
+
+  return res.data
+  } catch (err) {
+    console.error('Fetch summary error:', err)
+    throw err
+  }
+}

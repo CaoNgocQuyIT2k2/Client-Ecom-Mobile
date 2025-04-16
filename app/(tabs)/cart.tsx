@@ -285,7 +285,8 @@ const CartScreen = () => {
 export default CartScreen
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 20 },
+    
+    container: { flex: 1, paddingHorizontal: 20 ,backgroundColor:Colors.white},
   itemWrapper: {
     flexDirection: 'row',
     alignItems: 'center',

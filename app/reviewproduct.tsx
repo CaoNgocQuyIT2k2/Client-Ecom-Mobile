@@ -138,7 +138,7 @@ export default function ReviewProduct() {
       console.log("📌 Debug reviewData:", JSON.stringify(reviewData, null, 2))
   
       const response = await createReview(reviewData)
-      Alert.alert('Success', response.message)
+      Alert.alert('Success, You have received 0.02 bonus points', response.message)
       router.back()
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Unable to submit review')
